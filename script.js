@@ -1,43 +1,39 @@
-window.onload = function() {
-    var itemInput = document.getElementById('itemInput');
-    var addItemButton = document.getElementById('addItem');
-    var clearListButton = document.getElementById('clearList');
-    var shoppingList = document.getElementById('shoppingList');
+window.onload = () => {
+    const itemInput = document.getElementById('itemInput');
+    const addItemButton = document.getElementById('addItem');
+    const clearListButton = document.getElementById('clearList');
+    const shoppingList = document.getElementById('shoppingList');
 
-    var items = JSON.parse(localStorage.getItem('shoppingList')) || [];
+    let items = JSON.parse(localStorage.getItem('shoppingList')) || [];
 
-    function renderList() {
+    const renderList = () => {
         shoppingList.innerHTML = '';
-        for (var i = 0; i < items.length; i++) {
-            var li = document.createElement('li');
-            li.textContent = items[i].name;
-            if (items[i].purchased) {
+        items.forEach((item, index) => {
+            const li = document.createElement('li');
+            li.textContent = item.name;
+            if (item.purchased) {
                 li.classList.add('purchased');
             }
-            li.onclick = (function(index) {
-                return function() {
-                    items[index].purchased = !items[index].purchased;
+            li.onclick = () => {
+                item.purchased = !item.purchased;
+                localStorage.setItem('shoppingList', JSON.stringify(items));
+                renderList();
+            };
+            li.ondblclick = () => {
+                const newName = prompt('Edit item name:', item.name);
+                if (newName) {
+                    item.name = newName;
                     localStorage.setItem('shoppingList', JSON.stringify(items));
                     renderList();
-                };
-            })(i);
-            li.ondblclick = (function(index) {
-                return function() {
-                    var newName = prompt('Edit item name:', items[index].name);
-                    if (newName) {
-                        items[index].name = newName;
-                        localStorage.setItem('shoppingList', JSON.stringify(items));
-                        renderList();
-                    }
-                };
-            })(i);
+                }
+            };
             shoppingList.appendChild(li);
-        }
-    }
+        });
+    };
 
-    addItemButton.onclick = function() {
-        var itemName = itemInput.value;
-        if (itemName !== '') {
+    addItemButton.onclick = () => {
+        const itemName = itemInput.value;
+        if (itemName) {
             items.push({ name: itemName, purchased: false });
             itemInput.value = '';
             localStorage.setItem('shoppingList', JSON.stringify(items));
@@ -45,7 +41,7 @@ window.onload = function() {
         }
     };
 
-    clearListButton.onclick = function() {
+    clearListButton.onclick = () => {
         items = [];
         localStorage.setItem('shoppingList', JSON.stringify(items));
         renderList();
